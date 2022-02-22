@@ -1,25 +1,83 @@
 module.exports = function toReadable (number) {
-    let result;
-    const num = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'],
-        num10 = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'],
-        num20 = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'],
-        num100 = ['hundred', 'thousand', 'million', 'billion'],
-        n = String(num).split('');
+    const UNITS = {
+        1: 'one',
+        2: 'two',
+        3: 'three',
+        4: 'four',
+        5: 'five',
+        6: 'six',
+        7: 'seven',
+        8: 'eight',
+        9: 'nine',
+        10: 'ten',
+        11: 'eleven',
+        12: 'twelve',
+        13: 'thirteen',
+        14: 'fourteen',
+        15: 'fifteen',
+        16: 'sixteen',
+        17: 'seventeen',
+        18: 'eighteen',
+        19: 'nineteen',
+    };
 
-    if (num < 10) {
-        result = num[n[0]];
-    } else if (num >= 10 && num < 20) {
-        result = num10[n[1]];
-    } else if (num >= 20 && num < 100) {
-        result = `${num20[+n[0] - 2]} ${n[1] == 0 ? '' : num[n[1]]}`;
-    } else if (num >= 100 && num < 1000) {
-        result = `${num[n[0]]} ${num100[0]}`;
-        if (num % 100 > 9 && num % 100 < 20) {
-            result += ` ${num10[+n[2]]}`;
-        } else {
-            result += ` ${n[1] == 0 ? '' : num20[+n[1] - 2]} ${n[2] == 0 ? '' :num[n[2]]}`;
-        }
+    const DOZENS = {
+        2: 'twenty',
+        3: 'thirty',
+        4: 'forty',
+        5: 'fifty',
+        6: 'sixty',
+        7: 'seventy',
+        8: 'eighty',
+        9: 'ninety',
+    };
 
+
+    let dozens;
+    let dozensBig;
+    let hundreds;
+    let arr = [];
+    let readable;
+
+    if (number === 0) {
+        readable = 'zero';
+        return readable;
     }
-    return result.trim();
+
+    if (number > 0 && number < 20) {
+        readable = UNITS[number];
+        return readable
+    } else {
+        if (number >= 20 && number < 100) {
+
+            dozens = number % 10;
+            dozensBig = Math.floor(number / 10);
+
+            arr.push(DOZENS[dozensBig]);
+            arr.push(UNITS[dozens]);
+
+            return arr.join(' ').trim();
+        } else {
+            if (number - (Math.floor(number / 100) * 100) < 20) {
+                hundreds = Math.floor(number / 100);
+                dozens = number - (hundreds * 100);
+
+                arr.push(UNITS[hundreds] + ' hundred');
+                arr.push(UNITS[dozens]);
+
+                return arr.join(' ').trim();
+
+            } else {
+                hundreds = Math.floor(number / 100);
+                dozensBig = Math.floor((number - (hundreds * 100)) / 10);
+                dozens = number - (Math.floor(number/10) * 10);
+
+                arr.push(UNITS[hundreds] + ' hundred');
+                arr.push(DOZENS[dozensBig]);
+                arr.push(UNITS[dozens]);
+
+                return arr.join(' ').trim();
+            }
+        }
+    }
 };
